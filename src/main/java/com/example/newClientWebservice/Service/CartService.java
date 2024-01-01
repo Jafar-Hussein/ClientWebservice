@@ -18,10 +18,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.newClientWebservice.Service.UserService.login;
 
@@ -109,12 +106,6 @@ public class CartService {
             return Optional.of(cart);
         }
     }
-
-
-
-
-
-
 
     /**
      * Denna metod används för att lägga till en artikel i en cart.

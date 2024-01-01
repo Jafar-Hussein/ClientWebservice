@@ -98,17 +98,13 @@ public class UserMenu {
         Optional<Cart> optionalCart = getOneCartById(cartId, jwt);
 
         if (optionalCart.isPresent()) {
+            // Resten av koden för att hantera det valda varukorgen utan utskrift
             Cart cart = optionalCart.get();
-            System.out.println(String.format("Cart %s belongs to %s and contains:", cart.getId(), cart.getUsername()));
-            for (Article article : cart.getArticles()) {
-                System.out.println(String.format("Article: %s\n    Price: %d\n    Description: %s\n    Quantity: %d\n",
-                        article.getName(), article.getCost(), article.getDescription(), article.getQuantity()));
-            }
         } else {
             System.out.println("Cart does not exist. Please enter a valid cart ID.");
         }
     }
-
+    
     private static void deleteFruitFromCart(String jwt) throws IOException, ParseException {
         int cartId = getIntInput("Enter the cart ID: ");
         Optional<Cart> optionalCart = getOneCartById(cartId, jwt);
@@ -120,7 +116,6 @@ public class UserMenu {
             System.out.println("Cart does not exist. Please enter a valid cart ID.");
         }
     }
-
     private static void updateFruitQuantity(String jwt) throws IOException, ParseException {
         int cartId = getIntInput("Enter the cart ID: ");
         int articleId = getIntInput("Enter the article ID: ");
@@ -134,8 +129,6 @@ public class UserMenu {
             System.out.println("Cart does not exist. Please enter a valid cart ID.");
         }
     }
-
-
     private static void getHistory(String jwt) throws IOException, ParseException {
         List<History> histories = getCurrentUserHistory(jwt);
         System.out.println("\nPurchased Articles:\n");
