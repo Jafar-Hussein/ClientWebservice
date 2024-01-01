@@ -28,7 +28,7 @@ public class Login {
      */
     public static void loginMenu() throws IOException, ParseException {
         while (true) {
-            System.out.println("Login Menu");
+            System.out.println("\nLogin Menu");
             System.out.println("1. Login");
             System.out.println("2. Back to Main Menu");
 

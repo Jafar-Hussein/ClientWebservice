@@ -24,7 +24,7 @@ public class MainMenu {
     public static void runMeny() throws IOException, ParseException {
         while (isRunning) {
                 printMainMenu();
-            int choice = UtilService.getIntInput("Enter your choice: \n");
+            int choice = UtilService.getIntInput("Enter your choice: ");
             userChoice(choice);
 
         }
@@ -66,6 +66,7 @@ public class MainMenu {
             case 4:
                 System.out.println("Exiting...");
                 isRunning = false;
+                System.exit(0);
                 break;
             default:
                 System.out.println("Invalid input. Please enter a number between 1 and 4.");

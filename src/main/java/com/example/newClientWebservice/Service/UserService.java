@@ -131,7 +131,7 @@ public class UserService {
             System.out.println("Felaktigt användarnamn eller lösenord");
             return null;
         }
-        System.out.println(String.format("User %s has logged in", loginResponse.getUser().getUsername()));
+        System.out.println(String.format("\nUser %s has logged in", loginResponse.getUser().getUsername()));
         System.out.println(String.format("JWT token: %s", loginResponse.getJwt()));
 
         return loginResponse;

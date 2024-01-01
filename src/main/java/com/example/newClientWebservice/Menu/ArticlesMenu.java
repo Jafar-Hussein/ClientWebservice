@@ -19,7 +19,7 @@ public class ArticlesMenu {
      * varje loop ökar articleNumber med 1
      */
     public static void printArticlesMenu() { // prints out the articles from articleService
-        System.out.println("Articles Menu \n");
+        System.out.println("\nArticles Menu \n");
         List<Article> articles = ArticleService.getAllArticles();
         int articleNumber = 0;
         for (Article article : articles) {

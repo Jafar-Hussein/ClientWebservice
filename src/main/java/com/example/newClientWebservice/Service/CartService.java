@@ -2,7 +2,6 @@ package com.example.newClientWebservice.Service;
 
 import com.example.newClientWebservice.Models.Article;
 import com.example.newClientWebservice.Models.Cart;
-import com.example.newClientWebservice.Models.History;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
@@ -18,7 +17,8 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+
 
 import static com.example.newClientWebservice.Service.UserService.login;
 
@@ -71,7 +71,7 @@ public class CartService {
      * @param jwt är en String som innehåller en JWT-token.
      */
 
-    public static Optional<Cart> getOneCartById(int id, String jwt) throws IOException, ParseException {
+    public static void getOneCartById(int id, String jwt) throws IOException, ParseException {
         HttpGet request = new HttpGet(String.format("http://localhost:8081/webshop/cart/%d", id));
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
 
@@ -79,33 +79,25 @@ public class CartService {
             if (response.getCode() != 200) {
                 System.out.println("Something went wrong");
                 System.out.println(response.getCode());
-                return Optional.empty();
+                return;
             }
 
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity);
 
-            if (responseBody.isBlank()) {
-                System.out.println("Empty response body");
-                return Optional.empty();
-            }
-
             ObjectMapper mapper = new ObjectMapper();
-            Cart cart = mapper.readValue(responseBody, new TypeReference<Cart>() {});
+            Cart cart = mapper.readValue(responseBody, new TypeReference<Cart>() {
+            });
 
             System.out.println(String.format("Cart %s belongs to %s and contains:", cart.getId(), cart.getUsername()));
 
-            int articleNumber = 0;
-
             for (Article article : cart.getArticles()) {
-                articleNumber++;
-                System.out.println(String.format("Article %d: %s\n    Price: %d\n    Description: %s\n    Quantity: %d\n",
-                        articleNumber, article.getName(), article.getCost(), article.getDescription(), article.getQuantity()));
+                System.out.println(String.format(" id: %d\n Article: %s\n Price: %d\n Description: %s\n Quantity: %d\n",
+                        article.getId(),   article.getName(), article.getCost(), article.getDescription(), article.getQuantity()));
             }
-
-            return Optional.of(cart);
         }
     }
+
 
     /**
      * Denna metod används för att lägga till en artikel i en cart.
@@ -218,6 +210,3 @@ public class CartService {
 
 
 }
-
-
-
