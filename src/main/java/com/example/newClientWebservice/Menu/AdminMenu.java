@@ -1,6 +1,7 @@
 package com.example.newClientWebservice.Menu;
 
 import com.example.newClientWebservice.Models.Article;
+import com.example.newClientWebservice.Models.Cart;
 import com.example.newClientWebservice.Models.History;
 import com.example.newClientWebservice.Models.User;
 import com.example.newClientWebservice.Service.UtilService;
@@ -12,7 +13,6 @@ import java.util.List;
 
 import static com.example.newClientWebservice.Menu.UserMenu.userMenu;
 import static com.example.newClientWebservice.Service.ArticleService.*;
-import static com.example.newClientWebservice.Service.CartService.*;
 import static com.example.newClientWebservice.Service.HistoryService.getAllHistory;
 import static com.example.newClientWebservice.Service.UserService.getUsers;
 import static com.example.newClientWebservice.Service.UtilService.*;
@@ -114,12 +114,13 @@ public class AdminMenu {
     */
    public static void getAllHistories(String jwt) throws IOException, ParseException {
        List<History> histories = getAllHistory(jwt);
+       Cart cart = new Cart();
        System.out.println("Histories:");
        for (History history : histories) {
            for (Article article : history.getPurchasedArticles()) {
                System.out.println(String.format(
                        "id: %d \n  User: %s \n  name: %s \n  cost: %d \n  description: %s \n  quantity: %d \n  Total cost: %d",
-                       history.getId(), history.getUser().getUsername(), article.getName(), article.getCost(), article.getDescription(), article.getQuantity(), history.getTotalCost()
+                       history.getId(), history.getUser().getUsername(), article.getName(), article.getCost(), article.getDescription(), cart.getArticleQuantity(), history.getTotalCost()
                ));
            }
        }
@@ -133,12 +134,13 @@ public class AdminMenu {
         */
    public static void getAllCarts(String jwt) throws IOException, ParseException {
             List<History> histories = getAllHistory(jwt);
+            Cart cart = new Cart();
             System.out.println("Carts:");
             for (History history : histories) {
                 for (Article article : history.getPurchasedArticles()) {
                     System.out.println(String.format(
                             "id: %d \n  User: %s \n  name: %s \n  cost: %d \n  description: %s \n  quantity: %d \n  Total cost: %d",
-                            history.getId(), history.getUser().getUsername(), article.getName(), article.getCost(), article.getDescription(), article.getQuantity(), history.getTotalCost()
+                            history.getId(), history.getUser().getUsername(), article.getName(), article.getCost(), article.getDescription(), cart.getArticleQuantity(), history.getTotalCost()
                     ));
                 }
             }
@@ -190,11 +192,6 @@ public class AdminMenu {
             String newDescription = getStringInputForHttpPatch("If you want to change the description of the article. Enter the new description. Otherwise press enter:");
             if (!newDescription.isEmpty()) {
                 article.setDescription(newDescription);
-            }
-
-            int newQuantity = getIntInputForHttpPatch("If you want to change the quantity of the article. Enter the new quantity. Otherwise press enter:");
-            if (newQuantity != 0) {
-                article.setQuantity(newQuantity);
             }
 
             return updateArticle(id, existingArticle, article, jwt);

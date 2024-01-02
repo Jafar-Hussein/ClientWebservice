@@ -98,7 +98,6 @@ public class ArticleService {
         article.setName(getStringInput("Enter the name of the article:"));
         article.setCost(getIntInput("Enter the price of the article:"));
         article.setDescription(getStringInput("Enter the description of the article:"));
-        article.setQuantity(getIntInput("Enter the quantity of the article:"));
         return article;
     }
 
@@ -134,7 +133,7 @@ public class ArticleService {
         Article responseArticle = mapper.readValue(EntityUtils.toString(entity), new TypeReference<Article>() {});
 
         if (responseArticle.getName().equals(newArticle.getName()) && responseArticle.getCost() == newArticle.getCost()
-                && responseArticle.getDescription().equals(newArticle.getDescription()) && responseArticle.getQuantity() == newArticle.getQuantity()) {
+                && responseArticle.getDescription().equals(newArticle.getDescription())) {
             System.out.println(String.format("The article: %s, has been added", responseArticle.getName()));
         } else {
             System.out.println("Something went wrong");
@@ -164,9 +163,6 @@ public class ArticleService {
         if (article.getDescription() == null) {
             article.setDescription(existingArticle.getDescription());
         }
-        if (article.getQuantity() == 0) {
-            article.setQuantity(existingArticle.getQuantity());
-        }
 
         ObjectMapper mapper = new ObjectMapper();
         StringEntity payload = new StringEntity(mapper.writeValueAsString(article), ContentType.APPLICATION_JSON);
@@ -188,8 +184,7 @@ public class ArticleService {
 
         if ((responseArticle.getName() == null ? article.getName() == null : responseArticle.getName().equals(article.getName()))
                 && responseArticle.getCost() == article.getCost()
-                && (responseArticle.getDescription() == null ? article.getDescription() == null : responseArticle.getDescription().equals(article.getDescription()))
-                && responseArticle.getQuantity() == article.getQuantity()) {
+                && (responseArticle.getDescription() == null ? article.getDescription() == null : responseArticle.getDescription().equals(article.getDescription()))) {
             System.out.println(String.format("The article: %s, has been updated", responseArticle.getName()));
         } else {
             System.out.println("Something went wrong");

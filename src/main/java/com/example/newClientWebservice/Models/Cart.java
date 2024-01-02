@@ -19,6 +19,7 @@ public class Cart {
         private User user;
         private Set<Article> articles;
         private String username;
+        private int articleQuantity;
         public Cart(Long id) {
                 this.id = id;
         }
@@ -34,5 +35,6 @@ public class Cart {
                 }
                 return null;
         }
+
 
 }

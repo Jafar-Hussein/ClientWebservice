@@ -97,7 +97,7 @@ public class CartService {
 //        }
 //    }
 
-    public static Cart getOneCartById(int id, String jwt) throws IOException, ParseException {
+    public static Cart getOneCartById(long id, String jwt) throws IOException, ParseException {
         HttpGet request = new HttpGet(String.format("http://localhost:8081/webshop/cart/%d", id));
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
 
