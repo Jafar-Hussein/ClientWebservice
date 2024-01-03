@@ -2,6 +2,7 @@ package com.example.newClientWebservice.Service;
 
 import com.example.newClientWebservice.Models.Article;
 import com.example.newClientWebservice.Models.Cart;
+import com.example.newClientWebservice.Models.History;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
@@ -18,6 +19,7 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.newClientWebservice.Service.UserService.login;
 
@@ -40,27 +42,27 @@ public class CartService {
      * Denna metod används för att hämta alla carts från API:et.
      * @param jwt är en String som innehåller en JWT-token.
      */
-    public static void getAllCarts(String jwt) throws IOException, ParseException {
+
+    public static List<Cart> getAllCarts(String jwt) throws IOException, ParseException {
 
         HttpGet request = new HttpGet("http://localhost:8081/webshop/cart");
 
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
 
-        CloseableHttpResponse response = httpClient.execute(request);
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            if (response.getCode() != 200) {
+                System.out.println("Something went wrong");
+                System.out.println(response.getCode());
+                return null;
+            }
 
-        if (response.getCode() != 200) {
-            System.out.println("Something went wrong");
-            System.out.println(response.getCode());
-            return;
-        }
+            HttpEntity entity = response.getEntity();
 
-        HttpEntity entity = response.getEntity();
-
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayList<Cart> carts = mapper.readValue(EntityUtils.toString(entity), new TypeReference<ArrayList<Cart>>() {});
-
-        for (Cart cart : carts) {
-            System.out.println(String.format("Cart %s belongs to %s and contains %s", cart.getId(), cart.getUsername(), cart.getArticles()));
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(EntityUtils.toString(entity), new TypeReference<List<Cart>>() {});
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -97,7 +99,7 @@ public class CartService {
 //        }
 //    }
 
-    public static Cart getOneCartById(long id, String jwt) throws IOException, ParseException {
+    public static Cart getOneCartById(int id, String jwt) throws IOException, ParseException {
         HttpGet request = new HttpGet(String.format("http://localhost:8081/webshop/cart/%d", id));
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
 
@@ -115,8 +117,6 @@ public class CartService {
         }
         // Handle exceptions or issues outside of try-catch block as necessary
     }
-
-
 
 
     /**

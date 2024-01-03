@@ -22,6 +22,5 @@ public class Register {
      */
     public static void register() throws IOException, ParseException {
         UserService.register();
-
     }
 }

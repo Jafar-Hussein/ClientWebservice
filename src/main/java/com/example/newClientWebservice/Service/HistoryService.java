@@ -54,7 +54,7 @@ public class HistoryService {
 
             // konvertera response payload till ett användbart objekt
             ObjectMapper mapper = new ObjectMapper();
-           return mapper.readValue(EntityUtils.toString(entity), new TypeReference<ArrayList<History>>() {
+            return mapper.readValue(EntityUtils.toString(entity), new TypeReference<ArrayList<History>>() {
             });
 
 //            System.out.println("Histories:");
@@ -96,7 +96,7 @@ public class HistoryService {
 
             // konvertera response payload till ett användbart objekt
             ObjectMapper mapper = new ObjectMapper();
-           return mapper.readValue(EntityUtils.toString(entity), new TypeReference<ArrayList<History>>() {
+            return mapper.readValue(EntityUtils.toString(entity), new TypeReference<ArrayList<History>>() {
             });
 
         } catch (IOException | ParseException e) {
