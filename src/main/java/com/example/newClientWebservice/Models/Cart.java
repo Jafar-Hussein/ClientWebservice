@@ -17,9 +17,9 @@ public class Cart {
 
         private Long id;
         private User user;
-        private Set<CartArticle> cartArticles;
+        private Set<Article> articles;
         private String username;
-
+        private int articleQuantity;
         public Cart(Long id) {
                 this.id = id;
         }
@@ -36,5 +36,12 @@ public class Cart {
                 return null;
         }
 
-
+        @Override
+        public String toString() {
+                return "Cart{" +
+                        "id=" + id +
+                        ", user=" + user +
+                        ", articles=" + articles +
+                        '}';
+        }
 }
