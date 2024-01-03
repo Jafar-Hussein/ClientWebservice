@@ -57,8 +57,12 @@
 			<artifactId>jackson-core</artifactId>
 			<version>2.16.0</version>
 		</dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

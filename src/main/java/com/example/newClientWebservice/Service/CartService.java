@@ -2,8 +2,11 @@ package com.example.newClientWebservice.Service;
 
 import com.example.newClientWebservice.Models.Article;
 import com.example.newClientWebservice.Models.Cart;
+import com.example.newClientWebservice.Models.CartArticle;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import net.minidev.json.JSONObject;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
@@ -15,9 +18,11 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.newClientWebservice.Service.UserService.login;
 
@@ -40,27 +45,26 @@ public class CartService {
      * Denna metod används för att hämta alla carts från API:et.
      * @param jwt är en String som innehåller en JWT-token.
      */
-    public static void getAllCarts(String jwt) throws IOException, ParseException {
+    public static List<Cart> getAllCarts(String jwt) throws IOException, ParseException {
 
         HttpGet request = new HttpGet("http://localhost:8081/webshop/cart");
 
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
 
-        CloseableHttpResponse response = httpClient.execute(request);
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            if (response.getCode() != 200) {
+                System.out.println("Something went wrong");
+                System.out.println(response.getCode());
+                return null;
+            }
 
-        if (response.getCode() != 200) {
-            System.out.println("Something went wrong");
-            System.out.println(response.getCode());
-            return;
-        }
+            HttpEntity entity = response.getEntity();
 
-        HttpEntity entity = response.getEntity();
-
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayList<Cart> carts = mapper.readValue(EntityUtils.toString(entity), new TypeReference<ArrayList<Cart>>() {});
-
-        for (Cart cart : carts) {
-            System.out.println(String.format("Cart %s belongs to %s and contains %s", cart.getId(), cart.getUsername(), cart.getArticles()));
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(EntityUtils.toString(entity), new TypeReference<List<Cart>>() {});
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -125,10 +129,19 @@ public class CartService {
      * @param articleId är id:t för den artikel som ska läggas till.
      * @param jwt är en String som innehåller en JWT-token.
      */
-    public static void addArticleToCart(int cartId, int articleId, String jwt) throws IOException, ParseException {
+    public static void addArticleToCart(int cartId, int articleId, int quantity, String jwt) throws IOException, ParseException {
         HttpPost request = new HttpPost(String.format("http://localhost:8081/webshop/cart/%d", articleId));
 
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+        request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+
+        // Create a JSON object to hold the quantity
+        JSONObject json = new JSONObject();
+        json.put("quantity", quantity);
+
+        // Set the JSON object as the request entity
+        StringEntity entity = new StringEntity(json.toString());
+        request.setEntity(entity);
 
         CloseableHttpResponse response = httpClient.execute(request);
 
@@ -138,10 +151,10 @@ public class CartService {
             return;
         }
 
-        HttpEntity entity = response.getEntity();
+        HttpEntity responseEntity = response.getEntity();
 
         ObjectMapper mapper = new ObjectMapper();
-        Cart cart = mapper.readValue(EntityUtils.toString(entity), new TypeReference<Cart>() {});
+        Cart cart = mapper.readValue(EntityUtils.toString(responseEntity), new TypeReference<Cart>() {});
 
         System.out.println(String.format("Article %s added to cart %s", articleId, cartId));
     }
@@ -154,10 +167,18 @@ public class CartService {
      * @param jwt är en String som innehåller en JWT-token.
      */
     public static void updateArticleCount(int cartId, int articleId, int quantity, String jwt) throws IOException, ParseException {
-
-        HttpPatch request = new HttpPatch(String.format("http://localhost:8081/webshop/cart/%d/articles/%d?quantity=%d", cartId, articleId, quantity));
+        HttpPatch request = new HttpPatch(String.format("http://localhost:8081/webshop/cart/%d/articles/%d", cartId, articleId));
 
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+        request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+
+        // Create a JSON object to hold the quantity
+        JSONObject json = new JSONObject();
+        json.put("quantity", quantity);
+
+        // Set the JSON object as the request entity
+        StringEntity entity = new StringEntity(json.toString());
+        request.setEntity(entity);
 
         CloseableHttpResponse response = httpClient.execute(request);
 
@@ -167,10 +188,10 @@ public class CartService {
             return;
         }
 
-        HttpEntity entity = response.getEntity();
+        HttpEntity responseEntity = response.getEntity();
 
         ObjectMapper mapper = new ObjectMapper();
-        Cart cart = mapper.readValue(EntityUtils.toString(entity), new TypeReference<Cart>() {});
+        Cart cart = mapper.readValue(EntityUtils.toString(responseEntity), new TypeReference<Cart>() {});
 
         System.out.println(String.format("Article %s in cart %s has updated its quantity to %d", articleId, cartId, quantity));
     }
@@ -233,10 +254,10 @@ public class CartService {
         // Fetch the cart based on cartId and authorization jwt
         Cart cart = getOneCartById(cartId, jwt); // This would be a method that fetches the cart
 
-        // Check if the cart and its articles list are not null
-        if(cart != null && cart.getArticles() != null) {
-            for(Article article : cart.getArticles()) {
-                if(article.getId() == articleId) {
+        // Check if the cart and its cartArticles list are not null
+        if(cart != null && cart.getCartArticles() != null) {
+            for(CartArticle cartArticle : cart.getCartArticles()) {
+                if(cartArticle.getArticle().getId() == articleId) {
                     return true; // Article found
                 }
             }

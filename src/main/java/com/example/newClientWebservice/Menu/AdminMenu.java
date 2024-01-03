@@ -1,9 +1,7 @@
 package com.example.newClientWebservice.Menu;
 
-import com.example.newClientWebservice.Models.Article;
-import com.example.newClientWebservice.Models.Cart;
-import com.example.newClientWebservice.Models.History;
-import com.example.newClientWebservice.Models.User;
+import com.example.newClientWebservice.Models.*;
+import com.example.newClientWebservice.Service.CartService;
 import com.example.newClientWebservice.Service.UtilService;
 import org.apache.hc.core5.http.ParseException;
 
@@ -81,7 +79,7 @@ public class AdminMenu {
                      getAllCarts(jwt);
                     break;
                case 2:
-                    getAllHistories(jwt);
+                    /*getAllHistories(jwt);*/
                    break;
                case 3:
                    getAllUsers(jwt);
@@ -112,19 +110,20 @@ public class AdminMenu {
     * @throws IOException kastar ett undantag om det blir problem med inläsning från användaren.
     * @throws ParseException kastar ett undantag om det blir problem med parsning av JSON.
     */
-   public static void getAllHistories(String jwt) throws IOException, ParseException {
+   /*public static void getAllHistories(String jwt) throws IOException, ParseException {
        List<History> histories = getAllHistory(jwt);
-       Cart cart = new Cart();
        System.out.println("Histories:");
        for (History history : histories) {
-           for (Article article : history.getPurchasedArticles()) {
+           System.out.println("History ID: " + history.getId() + "\nUser: " + history.getUser().getUsername() + "\nTotal cost: " + history.getTotalCost());
+           for (CartArticle cartArticle : history.getPurchasedArticles()) {
+               Article article = cartArticle.getArticle();
                System.out.println(String.format(
-                       "id: %d \n  User: %s \n  name: %s \n  cost: %d \n  description: %s \n  quantity: %d \n  Total cost: %d",
-                       history.getId(), history.getUser().getUsername(), article.getName(), article.getCost(), article.getDescription(), cart.getArticleQuantity(), history.getTotalCost()
+                       "CartArticle ID: %d \n Article ID: %d \n name: %s \n cost: %d \n description: %s \n quantity: %d",
+                       cartArticle.getId(), article.getId(), article.getName(), article.getCost(), article.getDescription(), cartArticle.getArticleQuantity()
                ));
            }
        }
-   }
+   }*/
 
    /**
         * Den här metoden visar alla varukorgar.
@@ -132,19 +131,30 @@ public class AdminMenu {
         * @throws IOException kastar ett undantag om det blir problem med inläsning från användaren.
         * @throws ParseException kastar ett undantag om det blir problem med parsning av JSON.
         */
-   public static void getAllCarts(String jwt) throws IOException, ParseException {
-            List<History> histories = getAllHistory(jwt);
-            Cart cart = new Cart();
-            System.out.println("Carts:");
-            for (History history : histories) {
-                for (Article article : history.getPurchasedArticles()) {
-                    System.out.println(String.format(
-                            "id: %d \n  User: %s \n  name: %s \n  cost: %d \n  description: %s \n  quantity: %d \n  Total cost: %d",
-                            history.getId(), history.getUser().getUsername(), article.getName(), article.getCost(), article.getDescription(), cart.getArticleQuantity(), history.getTotalCost()
-                    ));
+
+    // Uppdaterad getAllCarts-metod i AdminMenu-klassen
+    public static void getAllCarts(String jwt) throws IOException, ParseException {
+        List<Cart> carts = CartService.getAllCarts(jwt);
+        System.out.println("\nAll current carts:\n");
+        for (Cart cart : carts) {
+            if (cart != null) {
+                System.out.println("Cart ID: " + cart.getId() + "\nUser: " + cart.getUsername());
+                if (!cart.getCartArticles().isEmpty()) { // Uppdaterad till getCartArticles
+                    for (CartArticle cartArticle : cart.getCartArticles()) { // Uppdaterad till CartArticle
+                        Article article = cartArticle.getArticle();
+                        System.out.println(String.format(
+                                "Article ID: %d \n  name: %s \n  cost: %d \n  description: %s \n  quantity: %d",
+                                article.getId(), article.getName(), article.getCost(), article.getDescription(), cartArticle.getArticleQuantity() // Uppdaterad till cartArticle.getArticleQuantity
+                        ));
+                    }
+                } else {
+                    System.out.println("The cart is empty.");
                 }
+            } else {
+                System.out.println("No cart found.");
             }
         }
+    }
 
         /**
         * Den här metoden visar alla användare.

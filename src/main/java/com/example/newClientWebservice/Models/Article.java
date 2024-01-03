@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 /**
  * Denna klass används för att skapa objekt av typen Article.
  *
@@ -18,6 +20,7 @@ public class Article {
     private String name;
     private int cost;
     private String description;
+    private Set<CartArticle> cartArticles;
 
     /**
      * Denna konstruktor används för att skapa ett objekt av typen Article.

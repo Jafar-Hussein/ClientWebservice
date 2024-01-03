@@ -1,9 +1,6 @@
 package com.example.newClientWebservice.Menu;
 
-import com.example.newClientWebservice.Models.Article;
-import com.example.newClientWebservice.Models.Cart;
-import com.example.newClientWebservice.Models.History;
-import com.example.newClientWebservice.Models.LoginResponse;
+import com.example.newClientWebservice.Models.*;
 import com.example.newClientWebservice.Service.ArticleService;
 import com.example.newClientWebservice.Service.CartService;
 import org.apache.hc.core5.http.ParseException;
@@ -81,28 +78,29 @@ public class UserMenu {
     private static void addFruitToCart(String jwt) throws IOException, ParseException {
         printArticlesMenu();
         int articleNumber = getIntInput("\nEnter the article number of a fruit to add to the basket: ");
+        int quantity = getIntInput("Enter the quantity of the fruit to add to the basket: ");
 
         List<Article> articles = ArticleService.getAllArticles();
         if (articleNumber > 0 && articleNumber <= articles.size()) {
             Article selectedArticle = articles.get(articleNumber - 1);
             int cartId = getIntInput("Enter the cart ID: ");
 
-            CartService.addArticleToCart(cartId, Math.toIntExact(selectedArticle.getId()), jwt);
+            CartService.addArticleToCart(cartId, Math.toIntExact(selectedArticle.getId()), quantity, jwt);
         } else {
             System.out.println("Invalid article number. Please try again.");
         }
     }
 
     private static void viewCart(String jwt) throws IOException, ParseException {
-        LoginResponse loginResponse = new LoginResponse();
         int cartId = getIntInput("Enter the cart ID: ");
         Cart cart = getOneCartById(cartId, jwt);
 
         if (cart != null) {
             System.out.println(String.format("\nCart %d belongs to %s and contains:",cart.getId(), cart.getUsername()));
-            for (Article article : cart.getArticles()) {
+            for (CartArticle cartArticle : cart.getCartArticles()) {
+                Article article = cartArticle.getArticle();
                 System.out.println(String.format(" id: %d\n Article: %s\n Price: %d\n Description: %s\n Quantity: %d\n",
-                        article.getId(), article.getName(), article.getCost(), article.getDescription(), cart.getArticleQuantity()));
+                        article.getId(), article.getName(), article.getCost(), article.getDescription(), cartArticle.getArticleQuantity()));
             }
         } else {
             System.out.println("Cart not found or an error occurred.");
